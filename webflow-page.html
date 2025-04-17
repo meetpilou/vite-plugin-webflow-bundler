@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🚀 Loader Preview</title>
+  <link href="https://cdn.jsdelivr.net/npm/reset-css@5.0.2/reset.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/styles/atom-one-light.min.css"
+    rel="stylesheet">
+  <style>
+    :root {
+      --color-neutral-100: #ffffff;
+      --color-neutral-200: #efeeec;
+      --color-neutral-300: #e3e1de;
+      --color-neutral-400: #d0cfcd;
+      --color-neutral-500: #818180;
+      --color-neutral-600: #2c2c2c;
+      --color-neutral-700: #1f1f1f;
+      --color-neutral-800: #131313;
+      --color-neutral-900: #000000;
+
+      --color-white: var(--color-neutral-100);
+      --color-light: var(--color-neutral-200);
+      --color-dark: var(--color-neutral-800);
+      --color-black: var(--color-neutral-900);
+      --color-font: var(--color-neutral-800);
+    }
+
+    /* ------------------------- Scaling System by Osmo [https://osmo.supply/] -------------------------  */
+
+    /* Desktop */
+    :root {
+      --size-unit: 16;
+      --size-container-ideal: 1440;
+      --size-container-min: 992px;
+      --size-container-max: 1920px;
+      --size-container: clamp(var(--size-container-min), 100vw, var(--size-container-max));
+      --size-font: calc(var(--size-container) / (var(--size-container-ideal) / var(--size-unit)));
+    }
+
+    /* Tablet */
+    @media screen and (max-width: 991px) {
+      :root {
+        --size-container-ideal: 1072;
+        --size-container-min: 840px;
+        --size-container-max: 991px;
+      }
+    }
+
+    /* Mobile Landscape */
+    @media screen and (max-width: 767px) {
+      :root {
+        --size-container-ideal: 420;
+        --size-container-min: 480px;
+        --size-container-max: 767px;
+      }
+    }
+
+    /* Mobile Portrait */
+    @media screen and (max-width: 479px) {
+      :root {
+        --size-container-ideal: 420;
+        /* screen-size in design - no px */
+        --size-container-min: 320px;
+        --size-container-max: 479px;
+      }
+    }
+
+    body {
+      background: var(--color-neutral-300);
+      padding: 2em;
+      font-size: var(--size-font);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+    }
+
+    h1 {
+      font-size: 1.75em;
+      margin-bottom: 0.5em;
+    }
+
+    h2 {
+      font-size: 1.2em;
+      margin-bottom: 0.5em;
+    }
+
+    .container {
+      max-width: var(--size-container);
+    }
+
+    .container.medium {
+      max-width: calc(var(--size-container) * 0.85);
+    }
+
+    .container.small {
+      max-width: calc(var(--size-container) * 0.7);
+    }
+
+    .wrapper {
+      max-width: calc(60vw - 2em);
+      margin: 0 auto;
+      padding: 2em;
+    }
+
+    .code {
+      padding-bottom: 1.5em;
+
+      &:not(:last-child) {
+        &::after {
+          content: '';
+          display: block;
+          width: 100%;
+          height: 0.0625em;
+          background-color: rgba(19, 19, 19, 0.12);
+          margin-top: 1em;
+        }
+      }
+
+    }
+
+    .code__title {
+      font-size: 0.6em;
+      text-transform: uppercase;
+      color: var(--color-neutral-500);
+      font-weight: 400;
+    }
+
+    .code__content {
+      pre {
+        position: relative;
+        overflow: auto;
+        background: var(--color-neutral-200);
+        border-radius: 0.5em;
+        border: 1px solid rgba(19, 19, 19, 0.12);
+        width: calc(100% - 1em);
+        padding: 0.5em;
+      }
+
+      code {
+        display: block;
+        width: calc(100% - 2em);
+        font-size: 0.6em !important;
+        letter-spacing: 0.02em;
+        line-height: 1.5;
+        background: var(--color-neutral-300);
+        border-radius: 0.5em;
+        white-space: pre-wrap;
+        word-break: break-word;
+        font-family: monospace;
+      }
+    }
+
+    .code__actions {
+      padding: 0.5em 0;
+    }
+
+    button {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 0em;
+      padding: 1em;
+      font-size: .8em;
+      background: var(--color-neutral-200);
+      border: 1px solid rgba(19, 19, 19, 0.12);
+      border-radius: 0.5em;
+      cursor: pointer;
+      transition: all;
+      transition-duration: 0.2s;
+    }
+
+    button:hover {
+      background: rgba(255, 255, 255, 0.6);
+
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrapper">
+    <div class="container">
+      <h1>🚀 Loader Snippets</h1>
+
+      <h2>CSS</h2>
+      <div class="code">
+        <div class="code__content">
+          <pre class=""
+            contenteditable="false"><h2 class="code__title">CSS Bundle</h2><code class="language-js">__CSS__</code></pre>
+        </div>
+        <div class="code__actions">
+          <button onclick="copy('css-code')">📋 Copy CSS Bundle</button>
+        </div>
+      </div>
+
+      __CSS_EXTRA_BLOCKS__
+
+      <h2>JAVASCRIPT</h2>
+
+      <div class="code">
+        <div class="code__content">
+          <pre class=""
+            contenteditable="false"><h2 class="code__title">JS Bundle</h2><code class="language-js">__JS__</code></pre>
+        </div>
+        <div class="code__actions">
+          <button onclick="copy('css-code')">📋 Copy JS Bundle</button>
+        </div>
+      </div>
+
+      __JS_EXTRA_BLOCKS__
+
+    </div>
+  </div>
+
+  <script>
+    function copy(id) {
+      const text = document.getElementById(id).value;
+      navigator.clipboard.writeText(text).then(() => {
+        alert('Copied!');
+      });
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
+
+  <script type="module">
+    document.addEventListener('DOMContentLoaded', (event) => {
+      document.querySelectorAll('pre code').forEach((el) => {
+        hljs.highlightElement(el);
+      });
+    });
+  </script>
+</body>
+
+</html>
