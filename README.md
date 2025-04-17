@@ -10,12 +10,11 @@ A Vite plugin that compiles and bundles your **JavaScript** and **CSS** files fo
 ## ✨ Features
 
 - ⚡ Automatically generates **CSS and JS loaders** for Webflow
-- 🔄 Watches for changes and rebundles into `dist/`
+- 🔄 Export files into `dist/`
 - 📦 Creates a `manifest.json` for CDN version tracking
 - 🧪 Local interface at `http://localhost:3000/webflow`
 - 🧠 Smart fallback logic: localhost → CDN
-- 🧹 Automatic minification (individual files + CSS bundle)
-- 📐 **Precise control of CSS order with `cssOrder`**
+- 🧹 Automatic minification (individual files)
 
 ---
 
@@ -133,7 +132,7 @@ dist/
 │   ├── reset.min.css
 │   ├── variables.min.css
 │   ├── ...
-│   └── bundle.min.css
+│   └── main.min.css
 ├── scripts/
 │   └── main.min.js
 ├── manifest.json
@@ -146,18 +145,6 @@ dist/
 
 1. Tries to load assets from `localhost`
 2. If that fails (e.g. in Webflow), it falls back to GitHub CDN (via jsDelivr)
-
----
-
-## 🎯 Bonus: CSS Order Control
-
-You can enforce the order of your CSS files in the bundle using the `cssOrder` option:
-
-```js
-cssOrder: ['reset.css', 'typography.css', 'styles.css']
-```
-
-Useful to avoid renaming or manually importing in your files.
 
 ---
 

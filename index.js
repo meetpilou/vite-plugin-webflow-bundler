@@ -50,8 +50,8 @@ async function loadUserConfig() {
 }
 
 function generateCssLoader(config) {
-  const cdn = `${getCdnBase(config)}/css/styles.min.css`
-  const local = 'http://localhost:3000/src/css/styles.css'
+  const cdn = `${getCdnBase(config)}/css/main.min.css`
+  const local = 'http://localhost:3000/src/css/main.css'
   return `(function(){
     const link=document.createElement("link");
     link.rel="stylesheet";
@@ -214,12 +214,6 @@ export default function webflowBundlerPlugin() {
         const jsLoaders = generatePageJsLoaders(config)
         const html = fs
           .readFileSync(htmlTemplatePath, 'utf-8')
-          .replace(
-            '__CSS__',
-            `<!-- 🚀 CSS loader --><script>${minifyJs(
-              generateCssLoader(config)
-            )}</script>`
-          )
           .replace(
             '__CSS_EXTRA_BLOCKS__',
             generateExtraHtmlBlocks(cssLoaders, 'css')
