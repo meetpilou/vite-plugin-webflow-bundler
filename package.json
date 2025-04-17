@@ -1,5 +1,5 @@
 {
-  "name": "vite-plugin-webflow-bundler",
+  "name": "@kobonostudio/vite-plugin-webflow-bundler",
   "version": "1.0.0",
   "description": "A Vite plugin for building modular assets with Webflow/CDN integration",
   "main": "index.js",
