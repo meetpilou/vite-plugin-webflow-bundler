@@ -185,21 +185,11 @@
 
       <h2>CSS</h2>
 
-      __CSS_EXTRA_BLOCKS__
+      __CSS_BLOCKS__
 
       <h2>JAVASCRIPT</h2>
 
-      <div class="code">
-        <div class="code__content">
-          <pre class=""
-            contenteditable="false"><h2 class="code__title">main.js</h2><code class="language-js">__JS__</code></pre>
-        </div>
-        <div class="code__actions">
-          <button onclick="copy('css-code')">📋 Copy main.js</button>
-        </div>
-      </div>
-
-      __JS_EXTRA_BLOCKS__
+      __JS_BLOCKS__
 
     </div>
   </div>
@@ -216,10 +206,32 @@
   <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.11.1/build/highlight.min.js"></script>
 
   <script type="module">
+    function setupCopyButtons() {
+      const codeBlocks = document.querySelectorAll('.code');
+      codeBlocks.forEach((block) => {
+        const button = block.querySelector('.code__actions button');
+        const codeElement = block.querySelector('pre code');
+        if (button && codeElement) {
+          button.addEventListener('click', () => {
+            const textToCopy = codeElement.innerText;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+              button.textContent = '✅ Copied!';
+              setTimeout(() => {
+                button.textContent = '📋 Copy ' + (block.querySelector('.code__title')?.textContent || 'code');
+              }, 1500);
+            }).catch(err => {
+              console.error('Erreur lors de la copie : ', err);
+            });
+          });
+        }
+      });
+    }
+
     document.addEventListener('DOMContentLoaded', (event) => {
       document.querySelectorAll('pre code').forEach((el) => {
         hljs.highlightElement(el);
       });
+      setupCopyButtons();
     });
   </script>
 </body>

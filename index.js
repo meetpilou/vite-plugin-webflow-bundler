@@ -11,6 +11,10 @@ function getCdnBase(config) {
   }@${config?.cdn?.branch || 'main'}`
 }
 
+function escapeHtml(str) {
+  return str.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
 function minifyCss(raw) {
   return raw
     .replace(/\s+/g, ' ')
@@ -49,74 +53,67 @@ async function loadUserConfig() {
   return {}
 }
 
-function generateCssLoader(config) {
-  const cdn = `${getCdnBase(config)}/css/main.min.css`
-  const local = 'http://localhost:3000/src/css/main.css'
-  return `(function(){
-    const link=document.createElement("link");
-    link.rel="stylesheet";
-    fetch("${local}",{method:"HEAD"})
-      .then(()=>link.href="${local}")
-      .catch(()=>link.href="${cdn}");
-    document.head.appendChild(link);
-  })()`
-}
-
-function generateJsLoader(config) {
-  const cdn = `${getCdnBase(config)}/scripts/main.min.js`
-  const local = 'http://localhost:3000/src/main.js'
-  return `document.addEventListener("DOMContentLoaded",function(){
-    const s=document.createElement("script");
-    s.type="module";
-    fetch("${local}",{method:"HEAD"})
-      .then(()=>s.src="${local}")
-      .catch(()=>s.src="${cdn}");
-    document.body.appendChild(s);
-  })`
-}
-
-function generateAdditionalCssLoaders(config) {
+function generateCssLoaders(config) {
   const cssDir = path.resolve(process.cwd(), 'src/css')
   if (!fs.existsSync(cssDir)) return []
   return fs
     .readdirSync(cssDir)
-    .filter((f) => f.endsWith('.css') && f !== 'styles.css')
+    .filter((f) => f.endsWith('.css'))
     .map((f) => {
       const base = f.replace('.css', '')
       const local = `http://localhost:3000/src/css/${f}`
       const cdn = `${getCdnBase(config)}/css/${base}.min.css`
-      const code = `(function(){
+      const code = `<script defer type="text/javascript">document.addEventListener("DOMContentLoaded",function(){
         const link=document.createElement("link");
         link.rel="stylesheet";
         fetch("${local}",{method:"HEAD"})
           .then(()=>link.href="${local}")
           .catch(()=>link.href="${cdn}");
         document.head.appendChild(link);
-      })()`
+      })</script>`
       return { name: base, code: minifyJs(code) }
     })
 }
 
-function generatePageJsLoaders(config) {
+function generateJsLoaders(config) {
+  const files = []
+
+  // Inclure le main.js
+  const mainPath = path.resolve(process.cwd(), 'src/main.js')
+  if (fs.existsSync(mainPath)) {
+    files.push({ name: 'main', file: 'main.js', path: mainPath })
+  }
+
+  // Inclure les fichiers dans src/pages
   const pagesDir = path.resolve(process.cwd(), 'src/pages')
-  if (!fs.existsSync(pagesDir)) return []
-  return fs
-    .readdirSync(pagesDir)
-    .filter((f) => f.endsWith('.js'))
-    .map((f) => {
-      const base = f.replace('.js', '')
-      const local = `http://localhost:3000/src/pages/${f}`
-      const cdn = `${getCdnBase(config)}/scripts/pages/${base}.min.js`
-      const code = `document.addEventListener("DOMContentLoaded",function(){
-        const s=document.createElement("script");
-        s.type="module";
-        fetch("${local}",{method:"HEAD"})
-          .then(()=>s.src="${local}")
-          .catch(()=>s.src="${cdn}");
-        document.body.appendChild(s);
-      })`
-      return { name: base, code: minifyJs(code) }
-    })
+  if (fs.existsSync(pagesDir)) {
+    const pageFiles = fs.readdirSync(pagesDir).filter((f) => f.endsWith('.js'))
+    for (const f of pageFiles) {
+      files.push({
+        name: f.replace('.js', ''),
+        file: f,
+        path: path.join(pagesDir, f),
+      })
+    }
+  }
+
+  return files.map(({ name, file }) => {
+    const local = `http://localhost:3000/${
+      file === 'main.js' ? 'src' : 'src/pages'
+    }/${file}`
+    const cdn = `${getCdnBase(config)}/scripts/${
+      file === 'main.js' ? '' : 'pages/'
+    }${name}.min.js`
+    const code = `<script defer type="text/javascript">document.addEventListener("DOMContentLoaded",function(){
+      const s=document.createElement("script");
+      s.type="module";
+      fetch("${local}",{method:"HEAD"})
+        .then(()=>s.src="${local}")
+        .catch(()=>s.src="${cdn}");
+      document.body.appendChild(s);
+    })</script>`
+    return { name, code: minifyJs(code) }
+  })
 }
 
 function generateExtraHtmlBlocks(loaders, type) {
@@ -125,10 +122,12 @@ function generateExtraHtmlBlocks(loaders, type) {
       return `<div class="code">
         <div class="code__content">
           <pre class=""
-            contenteditable="false"><h2 class="code__title">${name}.${type}</h2><code class="language-js" id="${type}-${name}">${code}</code></pre>
+            contenteditable="false"><h2 class="code__title">${name}.${type}</h2><code class="language-html" id="${type}-${name}">${escapeHtml(
+        code
+      )}</code></pre>
         </div>
         <div class="code__actions">
-          <button onclick="copy('${type}-${name}')">📋 Copy ${name}.${type}</button>
+          <button type="button">📋 Copy ${name}.${type}</button>
         </div>
       </div>`
     })
@@ -160,7 +159,7 @@ export default function webflowBundlerPlugin() {
         version: null,
         files: {
           cssMin: [],
-          bundle: 'css/bundle.min.css',
+          jsMin: [],
         },
       }
 
@@ -173,61 +172,34 @@ export default function webflowBundlerPlugin() {
         manifest.files.cssMin.push(`css/${base}.min.css`)
       }
 
-      const bundle = allCss.join('')
-      writeFileSafe(path.join(distCssDir, 'bundle.min.css'), bundle)
+      const jsLoaders = generateJsLoaders(config)
+      manifest.files.jsMin = jsLoaders.map((loader) => {
+        const base = loader.name === 'main' ? '' : 'pages/'
+        return `scripts/${base}${loader.name}.min.js`
+      })
+
       writeFileSafe(
         path.join(process.cwd(), 'dist/manifest.json'),
         JSON.stringify(manifest, null, 2)
       )
-      console.log('✅ CSS minified (individual + bundle.min.css)')
 
-      const htmlPath = path.resolve(process.cwd(), 'dist/index.html')
-      if (fs.existsSync(htmlPath)) {
-        let htmlContent = fs.readFileSync(htmlPath, 'utf-8')
-        const cssLoaderCode = `<!-- 🚀 CSS loader --><script>${minifyJs(
-          generateCssLoader(config)
-        )}</script>`
-        const jsLoaderCode = `<!-- 🚀 JS loader --><script>${minifyJs(
-          generateJsLoader(config)
-        )}</script>`
-        const cssLoaders = generateAdditionalCssLoaders(config)
-        const jsLoaders = generatePageJsLoaders(config)
-        htmlContent = htmlContent.replace(
-          '</body>',
-          `${cssLoaderCode}${cssLoaders
-            .map((l) => `<script>${l.code}</script>`)
-            .join('')}${jsLoaderCode}${jsLoaders
-            .map((l) => `<script>${l.code}</script>`)
-            .join('')}</body>`
-        )
-        fs.writeFileSync(htmlPath, htmlContent, 'utf-8')
-        console.log('✅ Injected loader scripts into dist/index.html')
-      }
+      console.log('✅ CSS minified')
     },
 
     async configureServer(server) {
       const open = (await import('open')).default
       const config = await loadUserConfig()
       const htmlTemplatePath = path.resolve(__dirname, 'webflow-page.html')
+
       server.middlewares.use('/webflow', (_, res) => {
-        const cssLoaders = generateAdditionalCssLoaders(config)
-        const jsLoaders = generatePageJsLoaders(config)
+        const cssLoaders = generateCssLoaders(config)
+        const jsLoaders = generateJsLoaders(config)
+
         const html = fs
           .readFileSync(htmlTemplatePath, 'utf-8')
-          .replace(
-            '__CSS_EXTRA_BLOCKS__',
-            generateExtraHtmlBlocks(cssLoaders, 'css')
-          )
-          .replace(
-            '__JS__',
-            `<!-- 🚀 JS loader --><script>${minifyJs(
-              generateJsLoader(config)
-            )}</script>`
-          )
-          .replace(
-            '__JS_EXTRA_BLOCKS__',
-            generateExtraHtmlBlocks(jsLoaders, 'js')
-          )
+          .replace('__CSS_BLOCKS__', generateExtraHtmlBlocks(cssLoaders, 'css'))
+
+          .replace('__JS_BLOCKS__', generateExtraHtmlBlocks(jsLoaders, 'js'))
         res.setHeader('Content-Type', 'text/html')
         res.end(html)
       })
