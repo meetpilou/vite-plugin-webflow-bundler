@@ -22,7 +22,7 @@ A Vite plugin that compiles and bundles your **JavaScript** and **CSS** files fo
 ## 📦 Installation
 
 ```bash
-npm install --save-dev @kobono-studio/vite-plugin-webflow-bundler
+npm install --save-dev @kobonostudio/vite-plugin-webflow-bundler
 ```
 
 ---
@@ -33,7 +33,7 @@ npm install --save-dev @kobono-studio/vite-plugin-webflow-bundler
 
 ```js
 import { defineConfig } from 'vite'
-import webflowBundlerPlugin from '@kobono-studio/vite-plugin-webflow-bundler'
+import webflowBundlerPlugin from '@kobonostudio/vite-plugin-webflow-bundler'
 
 export default defineConfig({
   plugins: [webflowBundlerPlugin()],
