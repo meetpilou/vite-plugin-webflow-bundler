@@ -103,7 +103,7 @@ function generateJsLoaders(config) {
     }/${file}`
     const cdn = `${getCdnBase(config)}/scripts/${
       file === 'main.js' ? '' : 'pages/'
-    }${name}.min.js`
+    }${name}.js`
     const code = `<script defer type="text/javascript">document.addEventListener("DOMContentLoaded",function(){
       const s=document.createElement("script");
       s.type="module";
@@ -175,7 +175,7 @@ export default function webflowBundlerPlugin() {
       const jsLoaders = generateJsLoaders(config)
       manifest.files.jsMin = jsLoaders.map((loader) => {
         const base = loader.name === 'main' ? '' : 'pages/'
-        return `scripts/${base}${loader.name}.min.js`
+        return `scripts/${base}${loader.name}.js`
       })
 
       writeFileSafe(

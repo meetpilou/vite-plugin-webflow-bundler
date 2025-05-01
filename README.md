@@ -129,12 +129,12 @@ This will:
 ```bash
 dist/
 ├── css/
-│   ├── reset.min.css
-│   ├── variables.min.css
+│   ├── reset.css
+│   ├── variables.css
 │   ├── ...
-│   └── main.min.css
+│   └── main.css
 ├── scripts/
-│   └── main.min.js
+│   └── main.js
 ├── manifest.json
 └── index.html (with injected loaders)
 ```
